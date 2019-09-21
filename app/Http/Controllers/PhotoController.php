@@ -25,7 +25,9 @@ class PhotoController extends Controller
                 'name' => $photo->name,
                 'url' => $photo->getFullUrl(),
                 'owner_id' => $photo->owner_id,
-                'users' => [],
+                'users' => $photo->users->map(function($item, $key) {
+                    return $item->id;
+                }),
             ];
         }
 
@@ -43,6 +45,10 @@ class PhotoController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'photo' => 'image',
+        ]);
+
         $image = $request->file('photo');
 
         $filename = time() . '.' . $image->getClientOriginalExtension();
@@ -65,7 +71,9 @@ class PhotoController extends Controller
 
     public function update(Request $request, Photo $photo)
     {
-
+        $request->validate([
+            '_method' => 'required, string, "in:put"',
+        ]);
     }
 
     public function delete(Request $request, Photo $photo)

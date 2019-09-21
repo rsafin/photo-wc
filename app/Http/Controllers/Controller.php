@@ -12,6 +12,7 @@ class Controller extends BaseController
 {
     public const CODE_OK = '200 OK';
     public const CODE_CREATED = '201 Created';
+    public const CODE_FORBIDDEN = '403 Forbidden';
     public const CODE_NOT_FOUND = '404 NOT FOUND';
     public const CODE_UNPROCESSABLE_ENTITY = 'Code: 422 Unprocessable entity';
 

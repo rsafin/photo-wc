@@ -4,8 +4,11 @@ namespace App\Exceptions;
 
 use App\Http\Controllers\Controller;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -51,6 +54,20 @@ class Handler extends ExceptionHandler
         if ($exception instanceof ModelNotFoundException) {
             return response()->json([
                 'Code' => Controller::CODE_NOT_FOUND
+            ], 404);
+        }
+
+        if ($exception instanceof TokenMismatchException) {
+            return response()->json([
+                'Code' => Controller::CODE_FORBIDDEN,
+                'Content' => ['message' => $exception->getMessage()],
+            ], 404);
+        }
+
+        if ($exception instanceof ValidationException) {
+            return response()->json([
+                'Code' => Controller::CODE_UNPROCESSABLE_ENTITY,
+                'Content' => $exception->errors(),
             ], 404);
         }
 

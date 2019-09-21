@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Photo;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -27,6 +28,15 @@ class UserController extends Controller
 
     public function share(Request $request, User $user)
     {
+        $photoId = json_decode($request->input('photos', ''), true);
 
+        $photos = Photo::find($photoId);
+
+        dump($user->share());
+        die();
+
+        $user->share()->saveMany($photos);
+
+        return $this->jsonResponse(self::CODE_CREATED, [], 201);
     }
 }

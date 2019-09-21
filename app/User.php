@@ -37,6 +37,13 @@ class User extends Authenticatable
         return $this->hasMany(Photo::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function share()
+    {
+        return $this->belongsToMany(Photo::class, 'user_photo');
+    }
 
     /**
      * @return string
