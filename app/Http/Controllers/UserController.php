@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Photo;
 use App\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class UserController
@@ -37,13 +39,39 @@ class UserController extends Controller
         return $this->jsonResponse(self::CODE_OK, $users, 200);
     }
 
+    /**
+     * //TODO: don't share for yourself
+     * @param Request $request
+     * @param User $user
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function share(Request $request, User $user)
     {
-        $photoId = json_decode($request->input('photos', ''), true);
+        $photosId = $request->input('photos');
 
-        $photos = Photo::find($photoId);
+
+        /**
+         * @var User $user
+         */
+        $me = Auth::user();
+        $shared = $user->share;
+
+        $sharedIds = array_values($shared->map(function($item, $key){
+            return $item->id;
+        })->all());
+
+
+        $idForAdd = array_diff($photosId, $sharedIds);
+
+        $photos = $me->photos()->find($idForAdd);
         $user->share()->saveMany($photos);
 
-        return $this->jsonResponse(self::CODE_CREATED, [], 201);
+        $existingPhotoIds = array_merge($sharedIds, $idForAdd);
+
+        $content = [
+            'existing_photos' => $existingPhotoIds,
+        ];
+
+        return $this->jsonResponse(self::CODE_CREATED, $content, 201);
     }
 }

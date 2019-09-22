@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Photo;
+use App\User;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +19,11 @@ class PhotoController extends Controller
      */
     public function index()
     {
-        $photos = Photo::all();
+        /**
+         * @var User $user
+         */
+        $user = Auth::user();
+        $photos = $user->photos->merge($user->share);
 
         foreach ($photos as $key => $photo) {
             $photos[$key] = [
@@ -54,6 +58,10 @@ class PhotoController extends Controller
         return $this->jsonResponse(self::CODE_OK, $content, 200);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -80,6 +88,12 @@ class PhotoController extends Controller
         return $this->jsonResponse(self::CODE_CREATED, $content,201);
     }
 
+    /**
+     * @param Request $request
+     * @param Photo $photo
+     * @return \Illuminate\Http\JsonResponse
+     * @throws AuthorizationException
+     */
     public function update(Request $request, Photo $photo)
     {
         $request->validate([
