@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -61,6 +62,12 @@ class Handler extends ExceptionHandler
             return response()->json([
                 'Code' => Controller::CODE_FORBIDDEN,
                 'Content' => ['message' => $exception->getMessage()],
+            ], 404);
+        }
+
+        if ($exception instanceof AuthorizationException || $exception instanceof MethodNotAllowedHttpException) {
+            return response()->json([
+                'Code' => Controller::CODE_FORBIDDEN,
             ], 404);
         }
 

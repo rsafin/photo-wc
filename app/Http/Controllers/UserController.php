@@ -20,7 +20,6 @@ class UserController extends Controller
     {
         $request->get('search');
 
-
         $users = User::query()->get(['id', 'first_name', 'surname', 'phone']);
 
         return $this->jsonResponse(self::CODE_OK, $users, 200);
@@ -31,10 +30,6 @@ class UserController extends Controller
         $photoId = json_decode($request->input('photos', ''), true);
 
         $photos = Photo::find($photoId);
-
-        dump($user->share());
-        die();
-
         $user->share()->saveMany($photos);
 
         return $this->jsonResponse(self::CODE_CREATED, [], 201);

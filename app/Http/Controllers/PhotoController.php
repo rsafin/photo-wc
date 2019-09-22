@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Photo;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,7 +42,16 @@ class PhotoController extends Controller
      */
     public function show(Photo $photo)
     {
-        return response()->json($photo, 200);
+        $content = [
+            'id' => $photo->id,
+            'name' => $photo->name,
+            'url' => $photo->getFullUrl(),
+            'owner_id' => $photo->owner_id,
+            'users' => $photo->users->map(function($item, $key) {
+                return $item->id;
+            }),
+        ];
+        return $this->jsonResponse(self::CODE_OK, $content, 200);
     }
 
     public function store(Request $request)
@@ -72,12 +83,56 @@ class PhotoController extends Controller
     public function update(Request $request, Photo $photo)
     {
         $request->validate([
-            '_method' => 'required, string, "in:put"',
+            '_method' => 'required',
         ]);
+
+        if (Auth::user()->id == $photo->owner->id)
+        {
+            if ($request->name) {
+                $photo->name = $request->name;
+            }
+
+
+            if($request->photo) {
+                $filename = time() . '.png';
+
+
+                $image = str_replace('data:image/png;base64,', '', $request->photo);
+                $image = str_replace(' ', '+', $image);
+                $image = base64_decode($image);
+                file_put_contents(public_path('images') . '/' . $filename, $image);
+
+                $photo->url = $filename;
+            }
+
+            $photo->save();
+
+            $content = [
+                'id' => $photo->id,
+                'name' => $photo->name,
+                'url' => $photo->getFullUrl(),
+            ];
+
+            return $this->jsonResponse(self::CODE_OK, $content, 200);
+        }
+
+        throw new AuthorizationException(self::CODE_FORBIDDEN, 403);
     }
 
-    public function delete(Request $request, Photo $photo)
+    /**
+     * @param Photo $photo
+     * @return \Illuminate\Http\JsonResponse
+     * @throws AuthorizationException
+     */
+    public function delete(Photo $photo)
     {
+        if (Auth::user()->id == $photo->owner->id)
+        {
+            $photo->delete();
 
+            return $this->jsonResponse(self::CODE_DELETED, null, 200);
+        }
+
+        throw new AuthorizationException(self::CODE_FORBIDDEN, 403);
     }
 }
