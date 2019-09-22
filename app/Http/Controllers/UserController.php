@@ -49,7 +49,6 @@ class UserController extends Controller
     {
         $photosId = $request->input('photos');
 
-
         /**
          * @var User $user
          */
@@ -66,10 +65,13 @@ class UserController extends Controller
         $photos = $me->photos()->find($idForAdd);
         $user->share()->saveMany($photos);
 
-        $existingPhotoIds = array_merge($sharedIds, $idForAdd);
+
+        $sharedIds = array_values($user->share()->get()->map(function($item, $key){
+            return $item->id;
+        })->all());
 
         $content = [
-            'existing_photos' => $existingPhotoIds,
+            'existing_photos' => $sharedIds,
         ];
 
         return $this->jsonResponse(self::CODE_CREATED, $content, 201);

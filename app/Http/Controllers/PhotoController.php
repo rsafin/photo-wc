@@ -96,10 +96,6 @@ class PhotoController extends Controller
      */
     public function update(Request $request, Photo $photo)
     {
-        $request->validate([
-            '_method' => 'required',
-        ]);
-
         if (Auth::user()->id == $photo->owner->id)
         {
             if ($request->name) {
@@ -109,7 +105,6 @@ class PhotoController extends Controller
 
             if($request->photo) {
                 $filename = time() . '.png';
-
 
                 $image = str_replace('data:image/png;base64,', '', $request->photo);
                 $image = str_replace(' ', '+', $image);

@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('photo', 'PhotoController@index');
 Route::middleware('auth:api')->get('photo/{photo}', 'PhotoController@show');
 Route::middleware('auth:api')->post('photo', 'PhotoController@store');
-Route::middleware('auth:api')->put('photo/{photo}', 'PhotoController@update');
+Route::middleware('auth:api')->patch('photo/{photo}', 'PhotoController@update');
 Route::middleware('auth:api')->delete('photo/{photo}', 'PhotoController@delete');
 
 Route::middleware('auth:api')->get('user', 'UserController@index');
