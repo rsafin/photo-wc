@@ -15,7 +15,7 @@ class Controller extends BaseController
     public const CODE_DELETED = '204 Deleted';
     public const CODE_FORBIDDEN = '403 Forbidden';
     public const CODE_NOT_FOUND = '404 NOT FOUND';
-    public const CODE_UNPROCESSABLE_ENTITY = 'Code: 422 Unprocessable entity';
+    public const CODE_UNPROCESSABLE_ENTITY = '422 Unprocessable entity';
 
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
