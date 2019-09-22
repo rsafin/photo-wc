@@ -18,9 +18,21 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $request->get('search');
+        $search = $request->get('search');
 
-        $users = User::query()->get(['id', 'first_name', 'surname', 'phone']);
+        $terms = explode(' ', $search);
+
+        $users = User::query();
+
+        foreach ($terms as $term) {
+            $users = $users->where(function($query) use ($term) {
+                $query->orWhere('first_name', 'like', "%{$term}%");
+                $query->orWhere('surname', 'like', "%{$term}%");
+                $query->orWhere('phone', 'like', "%{$term}%");
+            });
+        }
+
+        $users = $users->get(['id', 'first_name', 'surname', 'phone']);
 
         return $this->jsonResponse(self::CODE_OK, $users, 200);
     }
